@@ -15,3 +15,8 @@ const Entry = sequelize.define("entries", {
 
 
 });
+
+module.exports = {
+    db: sequelize,
+    Entry
+}
