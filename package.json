@@ -4,7 +4,8 @@
   "description": "In this journal API, you can create, read, update, and delete a journal entry. You can register for an account and log in.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node seed.js"
   },
   "keywords": [],
   "author": "",

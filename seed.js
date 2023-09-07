@@ -1,12 +1,12 @@
-const { seedEntry } = require('./seedData.js');
+const { entries } = require('./seedData');
 const { sequelize } = require('./db');
-const { Entry } = require('./models');
 
-const seed = async () => {
+const { Entry } = require('./server/models/index');
+
+const syncSeed = async () => {
     try {
         await sequelize.sync({ force: true });
-
-        await Promise.all(entries.map((entry) => Entry.create(entry)));
+        await Entry.bulkCreate(entries);
 
         console.log('db populated!');
     } catch (error){
@@ -14,4 +14,4 @@ const seed = async () => {
     }
 };
 
-seed();
+syncSeed();
