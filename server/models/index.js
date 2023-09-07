@@ -8,6 +8,10 @@ const Entry = sequelize.define("entries", {
     },
     date: {
         type: DataTypes.DATE
+    }, 
+    text: {
+        type: DataTypes.STRING
     }
+
 
 });
