@@ -1,5 +1,6 @@
-const { Sequelize, DataTyprd, Model } = require('sequelize');
+const { Sequelize } = require('sequelize');
 const path = require('path');
+
 
 const sequelize = new Sequelize({
     dialect: 'sqlite', 
@@ -7,4 +8,7 @@ const sequelize = new Sequelize({
     logging: false
 });
 
-module.exports = {sequelize};
+module.exports = {
+    sequelize,
+   
+};
