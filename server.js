@@ -1,14 +1,10 @@
-const express = require('express');
-const port = 8000;
-const app = express();
-const {sequelize} = require('./db');
-const {Entry} = require("./models/index")
+const app = require('./routes/app');
+const { sequelize } = require('./db');
 
-app.use(express.json());
-sequelize.sync();
-const routes = require('./routes/app');
+const { PORT = 8000} = process.env;
 
-app.listen(port, () => {
-    console.log(`Server is listening on port http://localhost:${port}`)
-});
+app.listen(PORT, () => {
+    sequelize.sync({force: false});
+    console.log(`Server running at http://localhost:${PORT}`);
+})
 
