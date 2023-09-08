@@ -1,4 +1,10 @@
-const {Entry} = require('./Entry')
+const {Entry} = require('./Entry');
+const {sequelize, Sequelize} = require('../db');
 
 
-module.exports = {Entry};
+
+module.exports = {
+    Entry,
+    sequelize,
+    Sequelize
+};
