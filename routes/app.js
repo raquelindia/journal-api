@@ -3,6 +3,7 @@ const app = express();
 const {Entry} = require('../models/index');
 const {sequelize} = require('../db');
 const {check, validationResult} = require("express-validator");
+const createApplication = require('express/lib/express');
 app.use(express.json());
 sequelize.sync();
 
@@ -17,13 +18,45 @@ app.get("/:id", async (request, response) => {
     response.json(getOneEntry);
 });
 
+app.post('/', async (request, response) =>{
+    const title = request.params.title;
+    const date = request.params.date;
+    const text = request.params.text;
 
-/*
-router.put('/', async (request, response) =>{
-    const id = reques.params.body;
+    const createEntry = await Entry.create({
+        title: title,
+        date: date,
+        text: text
+    });
+response.json(createEntry);
 
+});
+
+app.put("/:id", async (request, response) => {
+    const id = request.params.id;
+    const editTitle = request.body.title;
+    const editDate = request.body.date;
+    const editText = request.body.text;
+
+    const foundEntry = await Entry.findByPk(id);
+    const editEntry = await foundEntry.update({
+        title: editTitle,
+        date: editDate,
+        text: editText
+    });
+
+    response.json(editEntry);
+});
+
+app.delete('/:id', async (request, response) => {
+const id = request.params.id;
+const foundEntry = await Entry.findByPk(id);
+const deleteEntry = await foundEntry.destroy();
+const deleteMessage = `Journal entry ${id} deleted`;
+response.json(deletedMessage);
 
 })
-*/
+
+
 
 module.exports = app;

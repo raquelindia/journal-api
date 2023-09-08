@@ -1,19 +1,14 @@
-const seedData = require('./seedData');
-const { sequelize } = require('./db');
-const { Entry } = require('./models/index');
+const {sequelize} = require('./db');
+const seed = require('./seedFn');
 
+seed()
+ .then(() => {
+    console.log('Seeding success.');
+ })
+ .catch(err => {
+console.error(err);
+ })
+ .finally(() => {
+    sequelize.close();
+ });
 
-
-const syncSeed = async () => {
-    try {
-       //const entries = await .findAll();
-        //await sequelize.sync({ force: true });
-        await Entry.bulkCreate(seedData)
-
-        console.log('db populated!');
-    } catch (error){
-        console.error(error);
-    }
-};
-
-syncSeed();
