@@ -1,10 +1,15 @@
 const express = require('express');
 const app = express();
+const router = express.Router;
 const {Entry} = require('../models/index');
 const {sequelize} = require('../db');
-//const {check, validationResult} = require("express-validator");
+const {check, validationResult} = require("express-validator");
 app.use(express.json());
+//app.use(express.urlencoded({extended:true}));
 sequelize.sync();
+//const entriesRouter =
+
+//app.use("/entries", )
 
 app.get("/", async (request, response) => {
     const getEntries = await Entry.findAll();
@@ -45,6 +50,7 @@ app.put("/:id", async (request, response) => {
     });
 
     response.json(editEntry);
+
 });
 
 app.delete('/:id', async (request, response) => {
@@ -54,8 +60,7 @@ const deleteEntry = await foundEntry.destroy();
 const deleteMessage = `Journal entry ${id} deleted`;
 response.json(deletedMessage);
 
-})
 
-
+});
 
 module.exports = app;
