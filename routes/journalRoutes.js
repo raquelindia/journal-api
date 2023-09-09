@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const {Entry} = require('../models/Entry');
+const { auth } = require('express-openid-connect');
+
+
 
 //Home Page
 
@@ -8,6 +11,7 @@ router.get("/home", async (request, response) => {
     try{
     response.send(`
     <h1>Welcome to Your Journal</h1>
+    <h2>Log in at entries/login</h2>
     `);
     } catch(error){
         console.error(error)
@@ -18,8 +22,12 @@ router.get("/home", async (request, response) => {
 
 router.get("/", async (request, response) => {
     try{
+        if (request.oidc.isAuthenticated()){
     const getEntries = await Entry.findAll();
     response.status(200).json(getEntries);
+        } else {
+            response.status(200).send('Please log in');
+        }
     } catch(error){
         console.error(error);
         response.status(404).json('Could not find entries')

@@ -26,6 +26,29 @@ module.exports = {
         text: 'Started new TV show today'
     }
 
+    ],
+
+    users: [
+        {
+    
+                username: "jenny",
+                name: "Jenny Smith",
+                password: "jennyLovesCupcakess",
+                email: "jenny@example.com"
+              
+        },
+        {
+            username: "dean",
+            name: "Dean Rivers",
+            password: "dean134",
+            email: "dean@example.com"
+          },
+          {
+            username: "Amanda",
+            name: "Amanda McDonald",
+            password: "qwerty3788",
+            email: "amanda@example.com"
+          },
     ]
 };
 
