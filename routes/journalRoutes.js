@@ -71,7 +71,7 @@ const id = request.params.id;
 const foundEntry = await Entry.findByPk(id);
 const deleteEntry = await foundEntry.destroy();
 const deleteMessage = `Journal entry ${id} deleted`;
-response.status(200).json(deletedMessage);
+response.status(200).json(deleteMessage);
 }catch(error){
         console.error(error);
         response.status(404).json('Could not delete entry');
