@@ -1,4 +1,4 @@
-const { Sequelize } = require('sequelize');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 const path = require('path');
 
 
@@ -9,6 +9,6 @@ const sequelize = new Sequelize({
 });
 
 module.exports = {
-    sequelize,
+    sequelize
    
 };

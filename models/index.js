@@ -1,4 +1,6 @@
-const {Entry} = require('./Entry')
+const {Entry} = require('./Entry');
 
 
-module.exports = {Entry};
+module.exports = {
+    Entry
+}

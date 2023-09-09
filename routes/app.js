@@ -2,23 +2,22 @@ const express = require('express');
 const app = express();
 const {Entry} = require('../models/index');
 const {sequelize} = require('../db');
-const {check, validationResult} = require("express-validator");
-const createApplication = require('express/lib/express');
+//const {check, validationResult} = require("express-validator");
 app.use(express.json());
 sequelize.sync();
 
-app.get("/entries", async (request, response) => {
+app.get("/", async (request, response) => {
     const getEntries = await Entry.findAll();
     response.json(getEntries);
 });
 
-app.get("/entry/:id", async (request, response) => {
+app.get("/:id", async (request, response) => {
     const id = request.params.id;
     const getOneEntry = await Entry.findByPk(id);
     response.json(getOneEntry);
 });
 
-app.post('/entry', async (request, response) =>{
+app.post('/', async (request, response) =>{
     const title = request.params.title;
     const date = request.params.date;
     const text = request.params.text;
@@ -32,7 +31,7 @@ response.json(createEntry);
 
 });
 
-app.put("/entry/:id", async (request, response) => {
+app.put("/:id", async (request, response) => {
     const id = request.params.id;
     const editTitle = request.body.title;
     const editDate = request.body.date;
@@ -48,7 +47,7 @@ app.put("/entry/:id", async (request, response) => {
     response.json(editEntry);
 });
 
-app.delete('/entry/:id', async (request, response) => {
+app.delete('/:id', async (request, response) => {
 const id = request.params.id;
 const foundEntry = await Entry.findByPk(id);
 const deleteEntry = await foundEntry.destroy();
