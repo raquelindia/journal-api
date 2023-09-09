@@ -1,28 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const app = express();
-const {Entry} = require('../models/index');
-const {sequelize} = require('sequelize');
-//const {db} = require('./db');
-//const {check, validationResult} = require("express-validator");
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-//sequelize.sync();
-//const entriesRouter =
-app.use("/entries", router);
-
-// error handling middleware
-app.use((error, req, res, next) => {
-    console.error("SERVER ERROR: ", error);
-    if (res.statusCode < 400) res.status(500);
-    res.send({
-      error: error.message,
-      name: error.name,
-      message: error.message,
-      table: error.table,
-    });
-  });
-
+const {Entry} = require('../models/Entry');
 
 router.get("/", async (request, response) => {
     try{
@@ -101,5 +79,4 @@ response.status(200).json(deletedMessage);
 
 });
 
-module.exports = router,
-app;
+module.exports = router;
