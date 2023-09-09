@@ -5,7 +5,6 @@ const {entries} = require('./seedData');
 const seed = async () => {
    
     await sequelize.sync({force: true});
-
     await Promise.all(entries.map((entry) => Entry.create(entry)));
     
 };

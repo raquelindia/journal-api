@@ -2,6 +2,20 @@ const express = require('express');
 const router = express.Router();
 const {Entry} = require('../models/Entry');
 
+//Home Page
+
+router.get("/home", async (request, response) => {
+    try{
+    response.send(`
+    <h1>Welcome to Your Journal</h1>
+    `);
+    } catch(error){
+        console.error(error)
+        response.status(404).json("Home Not Found");
+    }
+});
+
+
 router.get("/", async (request, response) => {
     try{
     const getEntries = await Entry.findAll();

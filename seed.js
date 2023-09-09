@@ -8,7 +8,9 @@ seed()
  .catch(err => {
 console.error(err);
  })
+ /*
  .finally(() => {
     sequelize.close();
  });
 
+*/

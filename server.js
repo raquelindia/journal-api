@@ -1,10 +1,21 @@
-const app = require('./routes/app');
-const { sequelize } = require('./db');
 
-const { PORT = 8000} = process.env;
+const express = require('express');
+const app = express();
+const {sequelize} = require('./db');
+const seedData = require('./seed')
+const journalRouter = require('./routes/journalRoutes');
 
-app.listen(PORT, () => {
-    sequelize.sync({force: false});
-    console.log(`Server running at http://localhost:${PORT}`);
-})
+const port = 8000;
 
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
+
+app.use('/entries', journalRouter);
+
+
+app.listen(port, () => {
+  sequelize.sync()
+    console.log(`Listening on port http://localhost:${port}/entries/home`)
+});
