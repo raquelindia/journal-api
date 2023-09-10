@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const {Entry} = require('../models/Entry');
-const { auth } = require('express-openid-connect');
-
 
 
 //Home Page

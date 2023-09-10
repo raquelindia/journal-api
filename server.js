@@ -1,79 +1,51 @@
-require('dotenv').config('.env');
-const cors = require('cors');
-const morgan = require('morgan');
 const express = require('express');
 const app = express();
 const {sequelize} = require('./db');
 const seedData = require('./seed')
 const journalRouter = require('./routes/journalRoutes');
 const { auth } = require('express-openid-connect');
-const { User } = require('./models');
+const { User } = require('./models/User.js');
 const {jwt} = require('jsonwebtoken');
+const path = require('path');
 
-const port = 8000;
+
+
+//Error handling middleware
+require('dotenv').config('.env');
+const cors = require('cors');
+const morgan = require('morgan');
+
 
 //middleware 
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-
-
-const AUTH0_SECRET = process.env;
+ 
 
 //Auth0 config
-const config = {
+app.use(
+  auth({
   authRequired: false,
   auth0Logout: true,
-  secret: 'new secret',
-  baseUrl: 'https://localhost:8000',
-  clientID: 'CubHsrEtxqi47dgrxuodpDatOUSzYkiY',
-  issuerBaseUrl: 'https://dev-wmyn6dpovcmdzz3o.us.auth0.com'
-};
-
-//auth router attaches /login, /logout and /callback routes to the baseUrl
-app.use(auth(config));
+  secret: process.env.AUTH0_SECRET,
+  baseURL: process.env.AUTH0_BASE_URL,
+  clientID: process.env.AUTH0_CLIENT_ID,
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+  clientSecret: process.env.AUTH0_CLIENT_SECRET,
+}));
 
 
-//add user to database 
-app.use(async (request, response, next) => {
-  if(request.oidc.user){
-    const [user] = await User.findOrCreate({
-      where: {
-        username: request.oidc.user.nickname,
-        name: request.oidc.user.name,
-        email: request.oidc.user.email
-      }
-    });
-  }
-  next();
-});
-
-//check if user exists
-app.use(async (request, response, next) => {
-  try{
-    const auth = req.header('Authorization');
-    if(auth) {
-      const token = auth.split(' ')[1];
-      const decoded = jwt.verify(token, JWT_SECRET);
-      const user = await User.findByPk(decoded.id);
-      req.user = user;
-    }
-    next();
-  } catch(error){
-    next(error);
-  }
-});
-
-
-
-
-
-
+//Routes
 app.use('/entries', journalRouter);
 
+app.get('/', (req, res) => {
+  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+});
+
+const port = process.env.PORT || 8000;
 
 app.listen(port, () => {
   sequelize.sync()
-    console.log(`Listening on port https://localhost:${port}/entries/home`)
+    console.log(`Listening on port http://localhost:${port}/entries/home`)
 });
