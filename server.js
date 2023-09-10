@@ -33,6 +33,7 @@ app.use(
   clientID: process.env.AUTH0_CLIENT_ID,
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
+
 }));
 
 

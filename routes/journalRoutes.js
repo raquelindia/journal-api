@@ -7,7 +7,7 @@ const {Entry} = require('../models/Entry');
 
 router.get("/home", async (request, response) => {
     try{
-    response.send(`
+    response.status(200).send(`
     <h1>Welcome to Your Journal</h1>
     <h2>Log in at entries/login</h2>
     `);
@@ -16,6 +16,19 @@ router.get("/home", async (request, response) => {
         response.status(404).json("Home Not Found");
     }
 });
+
+
+// router.get('/login', async (request, response) => {
+//     try {
+//         response.status(200).send(`
+//         <h1>LOGIN To Your Journal HERE:</h1>
+//         `);
+
+//     } catch(error){
+//         console.error(error)
+//         response.status(404).json("Login Page Not Found");
+//     }
+// })
 
 
 router.get("/", async (request, response) => {
