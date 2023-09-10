@@ -39,6 +39,26 @@ app.use(
 //Routes
 app.use('/entries', journalRouter);
 
+
+//add user to database 
+
+app.use(async (request, response, next) => {
+  if(request.oidc.user){
+    const [user] = await User.findOrCreate({
+      where: {
+        username: request.oidc.user.nickname,
+        name: request.oidc.user.name,
+        email: request.oidc.user.email
+      }
+    });
+  }
+  next();
+});
+
+
+
+
+
 app.get('/', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
 });
