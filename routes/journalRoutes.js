@@ -35,9 +35,13 @@ router.get("/", async (request, response) => {
 
 router.get("/:id", async (request, response) => {
     try{
+        if(request.oidc.isAuthenticated()){
     const id = request.params.id;
     const getOneEntry = await Entry.findByPk(id);
     response.status(200).json(getOneEntry);
+        } else {
+            response.status(200).send('Please log in');
+        }
     } catch(error){
         console.error(error);
         response.status(404).json('Could not find entry');
@@ -46,6 +50,7 @@ router.get("/:id", async (request, response) => {
 
 router.post('/', async (request, response) =>{
     try{
+        if(request.oidc.isAuthenticated()){
     const title = request.body.title;
     const date = request.body.date;
     const text = request.body.text;
@@ -56,6 +61,9 @@ router.post('/', async (request, response) =>{
         text: text
     });
 response.status(200).json(createEntry);
+        } else {
+            response.status(200).send('Please log in');
+        }
     } catch(error){
         console.error(error);
         response.status(404).json('Could not POST entry');
@@ -65,6 +73,7 @@ response.status(200).json(createEntry);
 
 router.put("/:id", async (request, response) => {
     try{
+        if(request.oidc.isAuthenticated()){
     const id = request.params.id;
     const editTitle = request.body.title;
     const editDate = request.body.date;
@@ -78,6 +87,9 @@ router.put("/:id", async (request, response) => {
     });
 
     response.status(200).json(editEntry);
+} else {
+    response.status(200).send('Please log in');
+}
 }catch(error){
     console.error(error);
     response.status(404).json('could not update entry');
@@ -87,11 +99,15 @@ router.put("/:id", async (request, response) => {
 
 router.delete('/:id', async (request, response) => {
     try{
+        if(request.oidc.isAuthenticated()){
 const id = request.params.id;
 const foundEntry = await Entry.findByPk(id);
 const deleteEntry = await foundEntry.destroy();
 const deleteMessage = `Journal entry ${id} deleted`;
 response.status(200).json(deleteMessage);
+    } else {
+        response.status(200).send('Please log in');
+    }
 }catch(error){
         console.error(error);
         response.status(404).json('Could not delete entry');
