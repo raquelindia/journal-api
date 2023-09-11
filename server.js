@@ -47,7 +47,7 @@ app.use(bodyParser.json());
 app.use('/entries', journalRouter);
 
 
-app.get('/home/callback', (request, response) => {
+app.get('/callback', (request, response) => {
   auth0Client
   .exchangeCodeForAccessToken({ code: request.query.code})
   .then((authResult) => {
@@ -89,6 +89,14 @@ app.get('/home/callback', (request, response) => {
 app.get('/', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
 });
+
+
+//test
+app.get('/login', (req, res) => {
+  
+  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+});
+
 
 const port = process.env.PORT || 8000;
 
