@@ -31,30 +31,44 @@ router.get("/home", async (request, response) => {
 // })
 
 
+
+//Give access to all entries to SuperAdmin only 
 router.get("/", async (request, response) => {
     try{
-        if (request.oidc.isAuthenticated()){
+        if(request.oidc.isAuthenticated()){
+        const [superAdmin] = await SuperAdmin.findAll();
+        if (request.oidc.user.email == superAdmin[0].email){
     const getEntries = await Entry.findAll();
     response.status(200).json(getEntries);
         } else {
-            response.status(200).send('Please log in');
+            response.status(200).send('Access not authorized');
         }
+    } else {
+        response.status(200).send('Please log in');
+    }
     } catch(error){
         console.error(error);
-        response.status(404).json('Could not find entries')
+        response.status(404).json('Could not find entries');
     }
     
 });
 
+
+//Give access to all entries by id SuperAdmin only 
 router.get("/:id", async (request, response) => {
     try{
         if(request.oidc.isAuthenticated()){
+            const superAdmin = SuperAdmin.findAll();
+            if (request.oidc.user.email == superAdmin[0].email){
     const id = request.params.id;
     const getOneEntry = await Entry.findByPk(id);
     response.status(200).json(getOneEntry);
         } else {
-            response.status(200).send('Please log in');
+            response.status(200).send('Access not authorized');
         }
+    } else {
+        response.status(200).send('Please log in');
+    }
     } catch(error){
         console.error(error);
         response.status(404).json('Could not find entry');

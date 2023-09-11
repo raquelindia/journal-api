@@ -49,6 +49,22 @@ module.exports = {
             password: "qwerty3788",
             email: "amanda@example.com"
           },
+    ],
+
+    superadmins: [
+        {
+            username: "raquelindia",
+            name: "Raquel Cruz",
+            password: "superadmin123",
+            email: "raquelicruz94@gmail.com"
+        },
+        {
+            username: "test",
+            name: "test",
+            password: "test",
+            email: "test"
+        }
     ]
+
 };
 
