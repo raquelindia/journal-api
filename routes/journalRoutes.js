@@ -19,9 +19,11 @@ router.get("/home", async (request, response) => {
     }
 });
 
+
+//I don't know if /register works yet
 router.post('/register', async (request, response) => {
     try{
-    const username = request.oidc.user.username;
+    const username = request.oidc.user.nickname;
     const name = request.oidc.user.name;
     const email = request.oidc.user.email;
     const checkForUser = User.findOne({
@@ -47,23 +49,32 @@ router.post('/register', async (request, response) => {
         console.error(error);
         response.status(404).send('Not Found');
     }
-})
+});
 
 
-
-router.post('/login', async (request, response) => {
+//Login route
+/*
+router.post('/home/login', async (request, response) => {
+    const name = request.oidc.user.name;
+    const email = request.oidc.user.email;
     try {
-        response.status(200).send(`
-        <h1>LOGIN To Your Journal HERE:</h1>
-        `);
-
-    } catch(error){
+        const findUser = User.findOne({
+            where: {
+                email: email
+            }
+        });
+        if (findUser.email){
+             response.status(200).send(`Welcome Back ${name}!`);   
+        } else {
+            response.status(200).send('User not found');
+        }
+        } catch(error){
         console.error(error)
         response.status(404).json("Login Page Not Found");
     }
 })
 
-
+*/
 
 //Give access to all entries to SuperAdmin only 
 router.get("/", async (request, response) => {

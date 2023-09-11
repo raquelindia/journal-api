@@ -1,13 +1,15 @@
 const express = require('express');
 const app = express();
 const {sequelize} = require('./db');
+const bodyParser = require('body-parser');
 const seedData = require('./seed')
 const journalRouter = require('./routes/journalRoutes');
 const { auth } = require('express-openid-connect');
 const { User } = require('./models/User.js');
 const {jwt} = require('jsonwebtoken');
 const path = require('path');
-
+const auth0 = require('auth0');
+const { AuthenticationClient } = require('auth0');
 
 
 //Error handling middleware
@@ -36,28 +38,52 @@ app.use(
 
 }));
 
+// Express middleware for parsing JSON requests
+app.use(bodyParser.json());
+
+
 
 //Routes
 app.use('/entries', journalRouter);
 
 
-//add user to database 
+app.get('/home/callback', (request, response) => {
+  auth0Client
+  .exchangeCodeForAccessToken({ code: request.query.code})
+  .then((authResult) => {
+    const email = authResult.idTokenPayload.email;
+      const name = authResult.idTokenPayload.name; 
+      const username = authResult.idTokenPayload.nickname;
+    if(request.oidc.user){
+          const [user] = User.findOrCreate({
+            where: {
+              email: email },
+              defaults: {
+                username: username || 'Default Name',
+                name: name || 'Default Name'
+              },
 
-app.use(async (request, response, next) => {
-  if(request.oidc.user){
-    const [user] = await User.findOrCreate({
-      where: {
-        username: request.oidc.user.nickname,
-        name: request.oidc.user.name,
-        email: request.oidc.user.email
-      }
-    });
-  }
-  next();
+            
+          })
+          .then(([user, created]) => {
+            if (created){
+              console.log('User was created:', user.toJSON());
+            } else {
+              console.log('User was found:', user.toJSON());
+            }
+            response.json({ message: 'Login with Google successful', user: authResult});
+          })
+          };
+
+    response.json({ message: 'Login with Google successful', user: authResult });
+  })
+
+.catch((err) => {
+  console.error('Error finding or creating user:', err);
+  response.status(500).json({ message: 'Internal Server Error'});
 });
 
-
-
+});
 
 
 app.get('/', (req, res) => {
