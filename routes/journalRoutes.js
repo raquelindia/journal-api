@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {Entry} = require('../models/Entry');
+const { SuperAdmin } = require('../models');
 
 
 //Home Page
@@ -41,7 +42,7 @@ router.get("/", async (request, response) => {
     const getEntries = await Entry.findAll();
     response.status(200).json(getEntries);
         } else {
-            response.status(200).send('Access not authorized');
+            response.status(401).send('Access not authorized');
         }
     } else {
         response.status(200).send('Please log in');
@@ -64,7 +65,7 @@ router.get("/:id", async (request, response) => {
     const getOneEntry = await Entry.findByPk(id);
     response.status(200).json(getOneEntry);
         } else {
-            response.status(200).send('Access not authorized');
+            response.status(401).send('Access not authorized');
         }
     } else {
         response.status(200).send('Please log in');
@@ -89,7 +90,7 @@ router.post('/', async (request, response) =>{
     });
 response.status(200).json(createEntry);
         } else {
-            response.status(200).send('Please log in');
+            response.status(401).send('Please log in');
         }
     } catch(error){
         console.error(error);
@@ -115,7 +116,7 @@ router.put("/:id", async (request, response) => {
 
     response.status(200).json(editEntry);
 } else {
-    response.status(200).send('Please log in');
+    response.status(401).send('Please log in');
 }
 }catch(error){
     console.error(error);
@@ -127,14 +128,19 @@ router.put("/:id", async (request, response) => {
 router.delete('/:id', async (request, response) => {
     try{
         if(request.oidc.isAuthenticated()){
+            const superAdmin = SuperAdmin.findAll();
+            if(request.oidc.user.email == superAdmin[0].email){
 const id = request.params.id;
 const foundEntry = await Entry.findByPk(id);
 const deleteEntry = await foundEntry.destroy();
 const deleteMessage = `Journal entry ${id} deleted`;
 response.status(200).json(deleteMessage);
     } else {
-        response.status(200).send('Please log in');
+        response.status(401).send('Access not authorized');
     }
+} else {
+    response.status(401).send('Please log in');
+}
 }catch(error){
         console.error(error);
         response.status(404).json('Could not delete entry');
