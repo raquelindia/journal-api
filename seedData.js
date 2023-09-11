@@ -33,20 +33,17 @@ module.exports = {
     
                 username: "jenny",
                 name: "Jenny Smith",
-                password: "jennyLovesCupcakess",
                 email: "jenny@example.com"
               
         },
         {
             username: "dean",
             name: "Dean Rivers",
-            password: "dean134",
             email: "dean@example.com"
           },
           {
             username: "Amanda",
             name: "Amanda McDonald",
-            password: "qwerty3788",
             email: "amanda@example.com"
           },
     ],
@@ -55,13 +52,11 @@ module.exports = {
         {
             username: "raquelindia",
             name: "Raquel Cruz",
-            password: "superadmin123",
             email: "raquelicruz94@gmail.com"
         },
         {
             username: "test",
             name: "test",
-            password: "test",
             email: "test"
         }
     ]

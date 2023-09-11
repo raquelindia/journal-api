@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {Entry} = require('../models/Entry');
 const { SuperAdmin } = require('../models');
+const jwt = require('jsonwebtoken');
 
 
 //Home Page
@@ -18,18 +19,49 @@ router.get("/home", async (request, response) => {
     }
 });
 
+router.post('/register', async (request, response) => {
+    try{
+    const username = request.oidc.user.username;
+    const name = request.oidc.user.name;
+    const email = request.oidc.user.email;
+    const checkForUser = User.findOne({
+        where: {
+            email
+        }
+    })
+   if (checkForUser){
+    respond.status(200).send('User already exists');
+   } else {
+    const newUser = User.create({
+        where: {
+            username: username,
+            name: name,
+            email: email
+        }
+    });
 
-// router.get('/login', async (request, response) => {
-//     try {
-//         response.status(200).send(`
-//         <h1>LOGIN To Your Journal HERE:</h1>
-//         `);
 
-//     } catch(error){
-//         console.error(error)
-//         response.status(404).json("Login Page Not Found");
-//     }
-// })
+    response.status(200).send('Account created');
+}
+    } catch(error){
+        console.error(error);
+        response.status(404).send('Not Found');
+    }
+})
+
+
+
+router.post('/login', async (request, response) => {
+    try {
+        response.status(200).send(`
+        <h1>LOGIN To Your Journal HERE:</h1>
+        `);
+
+    } catch(error){
+        console.error(error)
+        response.status(404).json("Login Page Not Found");
+    }
+})
 
 
 
