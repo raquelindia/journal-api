@@ -12,8 +12,7 @@ const path = require('path');
 const auth0 = require('auth0');
 const { AuthenticationClient } = require('auth0');
 const crypto = require('crypto');
-const jwtSecret = crypto.randomBytes(32).toString('hex'); // 32 bytes (256 bits) is a common choice
-console.log(jwtSecret);
+
 
 
 
@@ -60,7 +59,7 @@ app.get('/', (req, res) => {
   `<h2>Welcome, ${req.oidc.user.name}</h2>
   <p><b>Username: ${req.oidc.user.nickname}</b></p>
   <p>${req.oidc.user.email}</p>
-  <img src="${req.oidc.user.picture}" alt="${req,oidc.user.name}">
+  <img src="${req.oidc.user.picture}" alt="${req.oidc.user.name}">
   ` : 'Logged out');
 });
 
