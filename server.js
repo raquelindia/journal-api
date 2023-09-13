@@ -127,8 +127,21 @@ res.status(200).send('Callback success, Welcome ${user}');
 
 
 
-app.get('/entries', async (req, res, next) => {
+app.post('/entries', async (req, res, next) => {
   try{
+    const {title, date, text} = req.body;
+    const creatorId = req.user.id;
+    if (req.user){
+      const entry = await Entry.create({
+        title,
+        date,
+        text,
+        creatorId: creatorId
+      })
+      res.json(entry);
+    } else {
+      res.status(401).send('You must be logged in to create an entry');
+    }
     const entries = await Entry.findAll();
     res.send(entries);
 
