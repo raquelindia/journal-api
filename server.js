@@ -58,7 +58,7 @@ app.use('/entries', journalRouter);
 app.get('/', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 
   `<h2>Welcome, ${req.oidc.user.name}</h2>
-  <p><b>Username: ${rew.oidc.user.nickname}</b></p>
+  <p><b>Username: ${req.oidc.user.nickname}</b></p>
   <p>${req.oidc.user.email}</p>
   <img src="${req.oidc.user.picture}" alt="${req,oidc.user.name}">
   ` : 'Logged out');
