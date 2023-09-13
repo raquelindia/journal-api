@@ -21,29 +21,6 @@ router.get("/home", async (request, response) => {
 
 
 
-//Login route
-/*
-router.post('/home/login', async (request, response) => {
-    const name = request.oidc.user.name;
-    const email = request.oidc.user.email;
-    try {
-        const findUser = User.findOne({
-            where: {
-                email: email
-            }
-        });
-        if (findUser.email){
-             response.status(200).send(`Welcome Back ${name}!`);   
-        } else {
-            response.status(200).send('User not found');
-        }
-        } catch(error){
-        console.error(error)
-        response.status(404).json("Login Page Not Found");
-    }
-})
-
-*/
 
 //Give access to all entries to SuperAdmin only 
 router.get("/", async (request, response) => {
