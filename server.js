@@ -115,6 +115,8 @@ const authenticateJWT = async (req, res, next) => {
 
 //test
 app.get('/callback', authenticateJWT, (req, res) => {
+  //try this- may not work 
+  const [user] = req.oidc.user.nickname;
   try{
 res.status(200).send('Callback success, Welcome ${user}');
   }catch(error){
