@@ -33,31 +33,32 @@ module.exports = {
     
                 username: "jenny",
                 name: "Jenny Smith",
-                email: "jenny@example.com"
+                email: "jennysmith@example.com"
               
         },
         {
             username: "dean",
-            name: "Dean Rivers",
-            email: "dean@example.com"
+            name: "Dean Brooks",
+            email: "deanbrooks@example.com"
+
           },
           {
             username: "Amanda",
-            name: "Amanda McDonald",
-            email: "amanda@example.com"
+            name: "Amanda Springer",
+            email: "amandaspringer@example.com"
+
           },
     ],
 
     superadmins: [
         {
-            username: "raquelindia",
-            name: "Raquel Cruz",
-            email: "raquelicruz94@gmail.com"
+           
+            username: "raquelicruz94"
+
         },
         {
-            username: "test",
-            name: "test",
-            email: "test"
+        
+            username: "test"
         }
     ]
 

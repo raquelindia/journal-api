@@ -20,37 +20,6 @@ router.get("/home", async (request, response) => {
 });
 
 
-//I don't know if /register works yet
-router.post('/register', async (request, response) => {
-    try{
-    const username = request.oidc.user.nickname;
-    const name = request.oidc.user.name;
-    const email = request.oidc.user.email;
-    const checkForUser = User.findOne({
-        where: {
-            email
-        }
-    })
-   if (checkForUser){
-    respond.status(200).send('User already exists');
-   } else {
-    const newUser = User.create({
-        where: {
-            username: username,
-            name: name,
-            email: email
-        }
-    });
-
-
-    response.status(200).send('Account created');
-}
-    } catch(error){
-        console.error(error);
-        response.status(404).send('Not Found');
-    }
-});
-
 
 //Login route
 /*

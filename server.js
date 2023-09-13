@@ -10,6 +10,10 @@ const {jwt} = require('jsonwebtoken');
 const path = require('path');
 const auth0 = require('auth0');
 const { AuthenticationClient } = require('auth0');
+const crypto = require('crypto');
+const jwtSecret = crypto.randomBytes(32).toString('hex'); // 32 bytes (256 bits) is a common choice
+console.log(jwtSecret);
+
 
 
 //Error handling middleware
@@ -23,7 +27,10 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+
  
+//JWT secret
+const {JWT_SECRET = 'neverTell'} = process.env; 
 
 //Auth0 config
 app.use(
@@ -51,16 +58,14 @@ app.get('/callback', (request, response) => {
   auth0Client
   .exchangeCodeForAccessToken({ code: request.query.code})
   .then((authResult) => {
-    const email = authResult.idTokenPayload.email;
-      const name = authResult.idTokenPayload.name; 
       const username = authResult.idTokenPayload.nickname;
     if(request.oidc.user){
           const [user] = User.findOrCreate({
             where: {
-              email: email },
+              username: username },
               defaults: {
                 username: username || 'Default Name',
-                name: name || 'Default Name'
+                
               },
 
             
@@ -92,11 +97,52 @@ app.get('/', (req, res) => {
 
 
 //test
+app.get('/logout', (req, res) => {
+  const returnTo = req.query.returnTo || '/authorize';
+  res.redirect(returnTo);
+
+})
+
 app.get('/login', (req, res) => {
-  
-  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+
+  const returnTo = req.query.returnTo || '/home';
+  res.redirect(returnTo);
 });
 
+app.use(async (req, res, next) => {
+  const username = req.oidc.user.nickname;
+  const name = req.oidc.user.name;
+  const email =  req.oidc.user.email;
+
+  if(req.oidc.user) {
+
+    const [user] = await User.findOrCreate({
+      where: {
+        username: username,
+        name: name,
+        email: email
+      }
+    })
+  }
+  next();
+});
+
+app.use(async (req, res, next) => {
+  try {
+
+    const auth = req.header('Authorization');
+    if (auth){
+      const token = auth.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const user = await User.findByPk(decode.id);
+      req.user = user;
+    }
+    next();
+
+  } catch(error){
+    next(error);
+  }
+})
 
 const port = process.env.PORT || 8000;
 
