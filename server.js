@@ -65,44 +65,6 @@ app.get('/', (req, res) => {
 });
 
 
-//test
-app.get('/callback', (request, response) => {
-  auth0Client
-  .exchangeCodeForAccessToken({ code: request.query.code})
-  .then((authResult) => {
-      const username = authResult.idTokenPayload.nickname;
-    if(request.oidc.user){
-          const [user] = User.findOrCreate({
-            where: {
-              username: username },
-              defaults: {
-                username: username || 'Default Name',
-                
-              },
-
-            
-          })
-          .then(([user, created]) => {
-            if (created){
-              console.log('User was created:', user.toJSON());
-            } else {
-              console.log('User was found:', user.toJSON());
-            }
-            response.json({ message: 'Login with Google successful', user: authResult});
-          })
-          };
-
-    response.json({ message: 'Login with Google successful', user: authResult });
-  })
-
-.catch((err) => {
-  console.error('Error finding or creating user:', err);
-  response.status(500).json({ message: 'Internal Server Error'});
-});
-
-});
-
-
 
 app.get('/logout', (req, res) => {
   const returnTo = req.query.returnTo || '/authorize';
@@ -134,7 +96,7 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.use(async (req, res, next) => {
+const authenticateJWT = async (req, res, next) => {
   try {
 
     const auth = req.header('Authorization');
@@ -149,8 +111,19 @@ app.use(async (req, res, next) => {
   } catch(error){
     next(error);
   }
-});
+};
 
+
+//test
+app.get('/callback', authenticateJWT, (req, res) => {
+  try{
+res.status(200).send('Callback success, Welcome ${user}');
+  }catch(error){
+    console.error(error);
+    res.status(200).send('Callback failed');
+  }
+
+});
 
 
 
@@ -164,6 +137,13 @@ app.get('/entries', async (req, res, next) => {
     next(error);
 
   }
+});
+
+//error handling middleware 
+app.use((error, req, res, next) => {
+  console.error('SERVER ERROR: ', error);
+  if(res.statusCode < 400) res.status(500);
+  res.send({error: error.message, name: error.name, message: error.message});
 });
 
 const port = process.env.PORT || 8000;
