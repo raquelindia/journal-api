@@ -102,8 +102,8 @@ const authenticateJWT = async (req, res, next) => {
     if (auth){
       const token = auth.split(' ')[1];
       const decoded = jwt.verify(token, JWT_SECRET);
-      const user = await User.findByPk(decode.id);
-      req.user = user;
+      const user = await User.findByPk(decoded.id);
+      req.oidc.user = user;
     }
     next();
 

@@ -22,19 +22,19 @@ router.get("/home", async (request, response) => {
 
 
 
-//Give access to all entries to SuperAdmin only 
+//Give access to all entries to SuperAdmin only **doesn't work**
 router.get("/all", async (request, response) => {
     try{
         const userEmail = request.oidc.user.email;
         if(request.oidc.isAuthenticated()){
-        const [superAdmin] = await SuperAdmin.findAll({
+        const superAdmin = await SuperAdmin.findAll({
             where: {
                 email: userEmail
             }
         });
         if (superAdmin){
-    const getEntries = await Entry.findAll();
-    response.status(200).json(getEntries);
+    const entries = await Entry.findAll();
+    response.status(200).json(entries);
         } else {
             response.status(401).send('Unauthorized');
         }
@@ -49,7 +49,7 @@ router.get("/all", async (request, response) => {
 });
 
 
-//Give access to all entries by id SuperAdmin only 
+//Give access to all entries by id SuperAdmin only **works**
 router.get("/:id", async (request, response) => {
     try{
         const userEmail = request.oidc.user.email;
@@ -133,7 +133,7 @@ router.delete('/:id', async (request, response) => {
     try{
         if(request.oidc.isAuthenticated()){
             const superAdmin = SuperAdmin.findAll();
-            if(request.oidc.user.email == superAdmin[0].email){
+            if(superAdmin){
 const id = request.params.id;
 const foundEntry = await Entry.findByPk(id);
 const deleteEntry = await foundEntry.destroy();
