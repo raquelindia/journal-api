@@ -38,7 +38,7 @@ router.get("/", async (request, response) => {
     }
     } catch(error){
         console.error(error);
-        response.status(404).json('Could not find entries');
+        response.status(404).send('error');
     }
     
 });
