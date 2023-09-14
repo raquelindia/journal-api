@@ -23,11 +23,16 @@ router.get("/home", async (request, response) => {
 
 
 //Give access to all entries to SuperAdmin only 
-router.get("/", async (request, response) => {
+router.get("/all", async (request, response) => {
     try{
+        const userEmail = request.oidc.user.email;
         if(request.oidc.isAuthenticated()){
-        const [superAdmin] = await SuperAdmin.findAll();
-        if (request.oidc.user.email == superAdmin[0].email){
+        const [superAdmin] = await SuperAdmin.findAll({
+            where: {
+                email: userEmail
+            }
+        });
+        if (superAdmin){
     const getEntries = await Entry.findAll();
     response.status(200).json(getEntries);
         } else {
@@ -47,9 +52,14 @@ router.get("/", async (request, response) => {
 //Give access to all entries by id SuperAdmin only 
 router.get("/:id", async (request, response) => {
     try{
+        const userEmail = request.oidc.user.email;
         if(request.oidc.isAuthenticated()){
-            const superAdmin = SuperAdmin.findAll();
-            if (request.oidc.user.email == superAdmin[0].email){
+            const superAdmin = SuperAdmin.findAll({
+                where: {
+                    email: userEmail
+                }
+            });
+            if (superAdmin){
     const id = request.params.id;
     const getOneEntry = await Entry.findByPk(id);
     response.status(200).json(getOneEntry);
