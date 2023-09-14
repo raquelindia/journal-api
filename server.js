@@ -127,19 +127,49 @@ res.status(200).send('Callback success, Welcome ${user}');
 });
 
 
-
-app.post('/entries', async (req, res, next) => {
+//user can create a post 
+app.post('/create/entries', async (req, res, next) => {
   try{
     const {title, date, text} = req.body;
-    const creatorId = req.user.id;
-    if (req.user){
-      const entry = await Entry.create({
+    //const creatorId = req.user.id;
+    const [user] = req.oidc.user;
+    const [email] = req.oidc.user.email;
+
+    if (req.oidc.isAuthenticated()){
+      const foundUser = User.findOne({
+        where: {
+          email: email
+         }
+      });
+      const createEntry = await Entry.create({
         title,
         date,
-        text,
-        creatorId: creatorId
-      })
-      res.json(entry);
+        text
+      });
+      const userAssociation = await User.findAll({ include: [{model: Entry, as: 'entries'}]});
+      const entryAssociation = await Entry.findAll({include: [{model: User, as: 'user'}]});
+      const loadedUser = await User.findOne({
+        where: {
+            id: user.id
+        },
+        include: Entry
+       });
+      // number of entries
+       const numberOfEntries = loadedUser.entries.length;
+       //index of newest entry
+       const index = numberOfEntries - 1;
+       //newest entry
+       const newestEntry = loadedUser.entries[index];
+
+       const entryTitle = createEntry.title;
+       const entryDate = createEntry.date;
+       const entryContent = createEntry.text;
+
+      res.status(200).send(`<h1>Successfully created entry number ${numberOfEntries}</h1>
+      <h2>${entryTitle}</h2>
+      <h3>${entryDate}</h3>
+      <p>${entryContent}</p>
+      `);
     } else {
       res.status(401).send('You must be logged in to create an entry');
     }
@@ -152,6 +182,76 @@ app.post('/entries', async (req, res, next) => {
 
   }
 });
+
+//user can read find all their entries 
+app.get('/user/entries', async (req, res, next) => {
+  try {
+    const [user] = req.oidc.user
+    const userId = req.oidc.user.id;
+    if(req.oidc.isAuthenticated()){
+      const userEntries = await Entry.findAll({
+        where: {
+          userId: userId
+        }
+      });
+      const [user] = req.oidc.user;
+      const [email] = req.oidc.user.email;
+  
+      if (user){
+        const foundUser = User.findOne({
+          where: {
+            email: email
+           }
+        });
+        const createEntry = await Entry.create({
+          title,
+          date,
+          text
+        });
+        const userAssociation = await User.findAll({ include: [{model: Entry, as: 'entries'}]});
+        const entryAssociation = await Entry.findAll({include: [{model: User, as: 'user'}]});
+        const loadedUser = await User.findOne({
+          where: {
+              id: user.id
+          },
+          include: Entry
+         });
+        // number of entries
+         const numberOfEntries = loadedUser.entries.length;
+         //index of newest entry
+         const index = numberOfEntries - 1;
+         //newest entry
+         const newestEntry = loadedUser.entries[index];
+  
+         const entryTitle = createEntry.title;
+         const entryDate = createEntry.date;
+         const entryContent = createEntry.text;
+
+
+      res.status(200).json(userEntries);
+    } else {
+      res.status(200).send('You have no journal entries');
+    }
+  }
+  } catch (error) {
+    console.error(error);
+    res.status(404).send('Cannot find user entries');
+  }
+});
+
+
+//user can find one entry out of all their entries
+app.get('/user/entries/:id', async (req, res) => {
+  try{
+    //if (req.user)
+
+  }catch(error){
+    console.error(error);
+    res.status(404).send('Could not find user entry');
+  }
+})
+
+
 
 //error handling middleware 
 app.use((error, req, res, next) => {
