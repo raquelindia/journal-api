@@ -116,31 +116,21 @@ const authenticateJWT = async (req, res, next) => {
 
 //test
 app.get('/callback', authenticateJWT, (req, res) => {
-  try{
-    auth0Client
-    .exchangeCodeForAccessToken({ code: req.query.code })
-    .then((authResult) => {
-      // Log the received tokens for debugging
-      console.log('Received tokens:', authResult);
-
-      // Check if the ID token is present in the response
-      if (!authResult.idToken) {
-        console.error('ID token not present in TokenSet');
-        res.status(401).json({ error: 'ID token not present in TokenSet' });
-        return;
-      }
-
-      // Continue with your logic
-      const username = authResult.idTokenPayload.nickname;
-      // ...
-      
-      res.json({ message: 'Login with Google successful', user: authResult });
-    })
-  } catch(err) {
-      console.error('Auth0 authentication failed:', err);
-      res.status(401).json({ message: 'Unauthorized' });
-    }
-
+  console.log('Received callback request');
+  
+  if (req.oidc.isAuthenticated()) {
+    // Authenticated user, you can access user information via req.oidc.user
+    console.log('Authenticated user:', req.oidc.user);
+    const { sub, email, nickname } = req.oidc.user;
+    // Handle authentication and authorization here
+    // ...
+    res.redirect('/home'); // Redirect to a secure route
+  } else {
+    // Handle authentication failure
+    console.error('Authentication failed');
+    res.status(401).json({ error: 'Authentication failed' });
+  }
+  
   })
 
 
