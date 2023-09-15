@@ -12,11 +12,11 @@ router.get("/home", async (request, response) => {
     try{
     response.status(200).send(`
     <h1>Welcome to Your Journal</h1>
-    <h2>Log in at entries/login</h2>
+    <h2>Log in <a href="https://journal-api-gu31.onrender.com/login">Here</a></h2>
     `);
     } catch(error){
         console.error(error)
-        response.status(404).json("Home Not Found");
+        response.status(500).json("Internal Server Error");
     }
 });
 
@@ -32,7 +32,13 @@ router.get('/users', async (request, response) => {
             });
             if(superAdmin.length > 0 ){
                 const users = await User.findAll();
-                response.status(200).json(users);
+                //check if users exist
+                if(users.length > 0){
+                    response.status(200).json(users);
+                } else {
+                    response.status(404).send('Users not found');
+                }
+                
             } else {
                 response.status(403).send('Unauthorized');
             }
@@ -60,7 +66,12 @@ router.get("/all", async (request, response) => {
         });
         if (superAdmin.length > 0){
     const entries = await Entry.findAll();
+    //check if entries exist 
+    if(entries.length > 0 ){
     response.status(200).json(entries);
+    } else {
+        response.status(404).send('No entries found');
+    }
         } else {
             response.status(403).send('Unauthorized');
         }
@@ -92,7 +103,12 @@ router.get("/:id", async (request, response) => {
                     id
                     }
                 });
+
+                if(getOneEntry.length > 0){
                 response.status(200).json(getOneEntry);
+                } else {
+                    response.status(404).send('Entry not found');
+                }
                     } else {
                         response.status(403).send('Unauthorized');
                     }
@@ -123,6 +139,8 @@ router.put("/:id", async (request, response) => {
     const editText = request.body.text;
 
     const foundEntry = await Entry.findByPk(id);
+    //check if entry exists
+    if (foundEntry.length > 0){
     const editEntry = await foundEntry.update({
         title: editTitle,
         date: editDate,
@@ -131,6 +149,9 @@ router.put("/:id", async (request, response) => {
 
     response.status(200).json(editEntry);
 } else {
+    response.status(404).send('Entry not found');
+}
+} else {
     response.status(403).send('Unauthorized');
 }
 } else {
@@ -138,7 +159,7 @@ router.put("/:id", async (request, response) => {
 }
 }catch(error){
     console.error(error);
-    response.status(404).json('could not update entry');
+    response.status(500).json('Internal Server Error');
 }
 
 });
@@ -157,28 +178,34 @@ router.delete('/:id', async (request, response) => {
             if(superAdmin.length > 0){
 const id = request.params.id;
 const foundEntry = await Entry.findByPk(id);
+//check if entry exists
+if (foundEntry.length > 0){
 const deleteEntry = await foundEntry.destroy({
     where: {
         id
     }
 });
-const deleteMessage = `Journal entry ${id} deleted`;
+const entryTitle = foundEntry.title;
+const deleteMessage = `Journal entry ${entryTitle} deleted`;
 response.status(200).json(deleteMessage);
+} else {
+    response.status(200).send('Entry not found');
+}
     } else {
-        response.status(403).send('Access not authorized');
+        response.status(403).send('Unauthorized');
     }
 } else {
     response.status(401).send('Please log in');
 }
 }catch(error){
         console.error(error);
-        response.status(404).json('Could not delete entry');
+        response.status(500).json('Internal Server Error');
     }
 
 }); 
 
 
-
+/*
 //user create entry endpoint
 router.post('/', async (request, response) =>{
     try{
@@ -205,7 +232,7 @@ response.status(200).json(createEntry);
     }
 
 });
-
+*/
 
 
 module.exports = router;

@@ -81,21 +81,39 @@ app.get('/user-created', async (req, res) => {
   const username = req.oidc.user.nickname;
   const name = req.oidc.user.name;
   const email =  req.oidc.user.email;
-
+try{
   if(req.oidc.isAuthenticated()) {
 
-    const [user] = await User.findOrCreate({
+    const [user] = await User.findAll({
       where: {
+        username: username
+      }
+    });
+
+    if(user.length > 0){
+    res.status(200).send(`Welcome Back, ${user}!`);
+    } else {
+      const createUser = await User.create({
         username: username,
         name: name,
         email: email
-      }
-    });
-    res.status(200).send(`Successfully created user: ${username}`);
+      })
+      const findNewUser = await User.findAll({
+        where: {
+          username: username
+        }
+      })
+      const getUsername = findNewUser.username;
+      res.status(200).send(`Welcome, ${getUsername}`);
+    }
 
   } else {
     res.status(500).send('Could not create user')
   }
+} catch (error){
+  console.error(error);
+  res.status(500).send('Internal Server Error');
+}
  
 });
 
@@ -203,8 +221,8 @@ app.get('/user/entries', async (req, res, next) => {
           creator: username
         }
       });
+      //check if entries exist
       if(userEntries.length > 0){ 
-
       res.status(200).json(userEntries);
       } else {
         res.status(200).send('You have no journal entries');
@@ -237,6 +255,7 @@ app.get('/user/entries/:id', async (req, res) => {
           id
         }
       });
+      //check if entry exists
       if(findEntry.length > 0){
       res.status(200).json(findEntry);
       } else {
