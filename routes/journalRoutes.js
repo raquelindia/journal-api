@@ -19,7 +19,29 @@ router.get("/home", async (request, response) => {
     }
 });
 
+//super admin view of all users
+router.get('/users', async (request, response) => {
+    try{
+        const userEmail = request.oidc.user.email;
+        if(request.oidc.isAuthenticated()){
+            const superAdmin = await SuperAdmin.findAll({
+                where:{
+                    email: userEmail
+                }
+            });
+            if(superAdmin.length > 0 ){
+                const users = User.findAll();
+                response.status(200).json(users);
+            } else {
+                response.status(404).send('Unauthorized');
+            }
+        }
 
+    } catch(error){
+        console.error(error);
+        response.status(404).send('Cannot find users');
+    }
+})
 
 
 //Give access to all entries to SuperAdmin only **works**
@@ -79,31 +101,6 @@ router.get("/:id", async (request, response) => {
         console.error(error);
         response.status(404).json('Could not find entry');
     }
-});
-
-
-//user create entry endpoint
-router.post('/', async (request, response) =>{
-    try{
-        if(request.oidc.isAuthenticated()){
-    const title = request.body.title;
-    const date = request.body.date;
-    const text = request.body.text;
-
-    const createEntry = await Entry.create({
-        title: title,
-        date: date,
-        text: text
-    });
-response.status(200).json(createEntry);
-        } else {
-            response.status(401).send('Please log in');
-        }
-    } catch(error){
-        console.error(error);
-        response.status(404).json('Could not POST entry');
-    }
-
 });
 
 //super admin edit endpoint
@@ -176,5 +173,36 @@ response.status(200).json(deleteMessage);
     }
 
 }); 
+
+
+
+//user create entry endpoint
+router.post('/', async (request, response) =>{
+    try{
+         const user = request.oidc.user;
+        if(request.oidc.isAuthenticated()){
+    const title = request.body.title;
+    const date = request.body.date;
+    const text = request.body.text;
+
+    const createEntry = await Entry.create({
+        title: title,
+        date: date,
+        text: text
+    });
+
+
+response.status(200).json(createEntry);
+        } else {
+            response.status(401).send('Please log in');
+        }
+    } catch(error){
+        console.error(error);
+        response.status(404).json('Could not POST entry');
+    }
+
+});
+
+
 
 module.exports = router;
