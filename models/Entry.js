@@ -5,7 +5,8 @@ const Entry = sequelize.define("entries", {
  title: Sequelize.STRING,
  date: Sequelize.STRING,
  text: Sequelize.STRING,
- creator: Sequelize.STRING
+ creator: Sequelize.STRING,
+ entryNumber: Sequelize.INTEGER
 });
 
 module.exports = {
