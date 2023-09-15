@@ -140,7 +140,7 @@ router.put("/:id", async (request, response) => {
 
     const foundEntry = await Entry.findByPk(id);
     //check if entry exists
-    if (foundEntry.length > 0){
+    if (foundEntry){
     const editEntry = await foundEntry.update({
         title: editTitle,
         date: editDate,
@@ -200,35 +200,6 @@ response.status(200).json(deleteMessage);
 
 }); 
 
-
-/*
-//user create entry endpoint
-router.post('/', async (request, response) =>{
-    try{
-         const user = request.oidc.user;
-        if(request.oidc.isAuthenticated()){
-    const title = request.body.title;
-    const date = request.body.date;
-    const text = request.body.text;
-
-    const createEntry = await Entry.create({
-        title: title,
-        date: date,
-        text: text
-    });
-
-
-response.status(200).json(createEntry);
-        } else {
-            response.status(401).send('Please log in');
-        }
-    } catch(error){
-        console.error(error);
-        response.status(404).json('Could not POST entry');
-    }
-
-});
-*/
 
 
 module.exports = router;
