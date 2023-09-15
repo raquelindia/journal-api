@@ -63,7 +63,7 @@ module.exports = {
     {
         title: 'Its my birthday!', 
         date: '2024-09-15',
-        text: 'Started new TV show today',
+        text: 'Happpy Birthday my guyyy! Love you <3',
         creator: 'chris'
     },
     {
@@ -81,7 +81,7 @@ module.exports = {
     {
         title: 'Tabrices second journal entry', 
         date: '2024-09-26',
-        text: 'Started new TV show today',
+        text: 'It rained today',
         creator: 'tabricedejanelleburns'
     },
     {
@@ -93,7 +93,7 @@ module.exports = {
     {
         title: 'Masayas second journal entry', 
         date: '2024-09-03',
-        text: 'Started new TV show today',
+        text: 'It rained today',
         creator: 'masaya'
     },
     {
@@ -105,7 +105,7 @@ module.exports = {
     {
         title: 'Tys second journal entry', 
         date: '2024-09-27',
-        text: 'Started new TV show today',
+        text: 'It rained today',
         creator: 'tellerbe16'
     }
 
