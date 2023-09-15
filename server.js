@@ -51,7 +51,7 @@ app.use(bodyParser.json());
 
 
 //Routes
-app.use('/entries', journalRouter);
+app.use('/admin', journalRouter);
 
 
 app.get('/', (req, res) => {
@@ -61,6 +61,20 @@ app.get('/', (req, res) => {
   <p>${req.oidc.user.email}</p>
   <img src="${req.oidc.user.picture}" alt="${req.oidc.user.name}">
   ` : 'Logged out');
+});
+
+
+//Home
+app.get("/home", async (request, response) => {
+  try{
+  response.status(200).send(`
+  <h1>Welcome to Your Journal</h1>
+  <h2>Log in <a href="https://journal-api-gu31.onrender.com/login">Here</a></h2>
+  `);
+  } catch(error){
+      console.error(error)
+      response.status(500).json("Internal Server Error");
+  }
 });
 
 
@@ -108,7 +122,7 @@ try{
     }
 
   } else {
-    res.status(500).send('Could not create user')
+    res.status(500).send('Could not create user');
   }
 } catch (error){
   console.error(error);
@@ -164,7 +178,6 @@ app.get('/callback', authenticateJWT, (req, res) => {
 app.post('/create/entries', async (req, res, next) => {
   try{
     const {title, date, text} = req.body;
-    //const creatorId = req.user.id;
     const [username] = req.oidc.user.nickname;
 
     if (req.oidc.isAuthenticated()){
@@ -181,7 +194,7 @@ app.post('/create/entries', async (req, res, next) => {
         }
       });
 
-      const findThisEntry = await findUserEntries.findAll({
+      const findThisEntry = await findUserEntries.findOne({
         where: {
           title: title
         }
@@ -212,7 +225,7 @@ app.post('/create/entries', async (req, res, next) => {
 });
 
 //user can read all their entries 
-app.get('/user/entries', async (req, res, next) => {
+app.get('/entries', async (req, res, next) => {
   try {
     const username = req.oidc.user.nickname;
     if(req.oidc.isAuthenticated()){
@@ -239,7 +252,7 @@ app.get('/user/entries', async (req, res, next) => {
 
 
 //user can find one entry out of all their entries
-app.get('/user/entries/:id', async (req, res) => {
+app.get('/entries/:id', async (req, res) => {
   const id = req.params.id;
     const username = req.oidc.user.nickname;
     try{
@@ -269,7 +282,7 @@ app.get('/user/entries/:id', async (req, res) => {
 
 
 //user update entry
-app.put('user/entry/update/:id', async (req, res) => {
+app.put('/entry/update/:id', async (req, res) => {
   const id = req.params.id;
   const {title, date, text} = req.body;
     const username = req.oidc.user.nickname;
@@ -304,7 +317,7 @@ app.put('user/entry/update/:id', async (req, res) => {
 })
 
 //user delete entry 
-app.delete('user/entry/delete/:id', async (req, res) => {
+app.delete('/entry/delete/:id', async (req, res) => {
   const id = req.params.id;
     const username = req.oidc.user.nickname;
     try{

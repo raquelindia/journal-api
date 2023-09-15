@@ -6,19 +6,7 @@ const {User} = require('../models/index')
 const jwt = require('jsonwebtoken');
 
 
-//Home Page
 
-router.get("/home", async (request, response) => {
-    try{
-    response.status(200).send(`
-    <h1>Welcome to Your Journal</h1>
-    <h2>Log in <a href="https://journal-api-gu31.onrender.com/login">Here</a></h2>
-    `);
-    } catch(error){
-        console.error(error)
-        response.status(500).json("Internal Server Error");
-    }
-});
 
 //super admin view of all users
 router.get('/users', async (request, response) => {
@@ -87,7 +75,7 @@ router.get("/all", async (request, response) => {
 
 
 //Give access to all entries by id SuperAdmin only **works**
-router.get("/:id", async (request, response) => {
+router.get("/all/:id", async (request, response) => {
     try{
         const id = request.params.id;
         const userEmail = request.oidc.user.email;
@@ -123,7 +111,7 @@ router.get("/:id", async (request, response) => {
 });
 
 //super admin edit endpoint
-router.put("/:id", async (request, response) => {
+router.put("/all/:id", async (request, response) => {
     try{
         const userEmail = request.oidc.user.email;
         if(request.oidc.isAuthenticated()){
@@ -166,7 +154,7 @@ router.put("/:id", async (request, response) => {
 
 
 //super admin delete endpoint 
-router.delete('/:id', async (request, response) => {
+router.delete('/all/:id', async (request, response) => {
     try{
         if(request.oidc.isAuthenticated()){
             const userEmail = request.oidc.user.email
