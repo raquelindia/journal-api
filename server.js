@@ -5,8 +5,8 @@ const bodyParser = require('body-parser');
 const seedData = require('./seed')
 const journalRouter = require('./routes/journalRoutes');
 const { auth } = require('express-openid-connect');
-const { User } = require('./models/User.js');
-const {Entry} = require('./models/Entry');
+const { User } = require('./models/index');
+const {Entry} = require('./models/index');
 const {jwt} = require('jsonwebtoken');
 const path = require('path');
 const auth0 = require('auth0');
@@ -157,9 +157,9 @@ app.post('/create/entries', async (req, res, next) => {
          }
       });
       const createEntry = await Entry.create({
-        title,
-        date,
-        text
+        title: title,
+        date: date,
+        text: text
       });
       const userAssociation = await User.findAll({ include: [{model: Entry, as: 'entries'}]});
       const entryAssociation = await Entry.findAll({include: [{model: User, as: 'user'}]});
@@ -179,6 +179,11 @@ app.post('/create/entries', async (req, res, next) => {
        const entryTitle = createEntry.title;
        const entryDate = createEntry.date;
        const entryContent = createEntry.text;
+      const userIndex = user.id - 1;
+       const thisUser = userAssociation[userIndex];
+       
+
+       await thisUser.addEntry(newestEntry);
 
       res.status(200).send(`<h1>Successfully created entry number ${numberOfEntries}</h1>
       <h2>${entryTitle}</h2>
@@ -198,7 +203,7 @@ app.post('/create/entries', async (req, res, next) => {
   }
 });
 
-//user can read find all their entries 
+//user can read all their entries 
 app.get('/user/entries', async (req, res, next) => {
   try {
     const [user] = req.oidc.user
@@ -209,46 +214,12 @@ app.get('/user/entries', async (req, res, next) => {
           userId: userId
         }
       });
-      const [user] = req.oidc.user;
-      const [email] = req.oidc.user.email;
-  
-      if (user){
-        const foundUser = User.findOne({
-          where: {
-            email: email
-           }
-        });
-        const createEntry = await Entry.create({
-          title,
-          date,
-          text
-        });
-        const userAssociation = await User.findAll({ include: [{model: Entry, as: 'entries'}]});
-        const entryAssociation = await Entry.findAll({include: [{model: User, as: 'user'}]});
-        const loadedUser = await User.findOne({
-          where: {
-              id: user.id
-          },
-          include: Entry
-         });
-        // number of entries
-         const numberOfEntries = loadedUser.entries.length;
-         //index of newest entry
-         const index = numberOfEntries - 1;
-         //newest entry
-         const newestEntry = loadedUser.entries[index];
-  
-         const entryTitle = createEntry.title;
-         const entryDate = createEntry.date;
-         const entryContent = createEntry.text;
-
-
       res.status(200).json(userEntries);
     } else {
       res.status(200).send('You have no journal entries');
     }
   }
-  } catch (error) {
+   catch (error) {
     console.error(error);
     res.status(404).send('Cannot find user entries');
   }
@@ -257,14 +228,102 @@ app.get('/user/entries', async (req, res, next) => {
 
 //user can find one entry out of all their entries
 app.get('/user/entries/:id', async (req, res) => {
-  try{
-    //if (req.user)
 
-  }catch(error){
+  const [user] = req.oidc.user
+  const id = req.params.id;
+    const userId = req.oidc.user.id;
+    try{
+    if(req.oidc.isAuthenticated()){
+      const userEntries = await Entry.findAll({
+        where: {
+          userId: userId
+        }
+      });
+
+      const findEntry = await userEntries.findAll({
+        where: {
+          id
+        }
+      });
+      res.status(200).json(findEntry);
+    } else {
+      res.status(200).send('You have no journal entries');
+    }
+  }
+   catch (error) {
     console.error(error);
-    res.status(404).send('Could not find user entry');
+    res.status(404).send('Cannot find user entries');
+  }
+});
+
+
+//user update entry
+app.put('user/entry/update/:id', async (req, res) => {
+  const [user] = req.oidc.user
+  const id = req.params.id;
+  const {title, date, text} = req.body;
+    const userId = req.oidc.user.id;
+    try{
+    if(req.oidc.isAuthenticated()){
+      const userEntries = await Entry.findAll({
+        where: {
+          userId: userId
+        }
+      });
+
+      const findEntry = await userEntries.findAll({
+        where: {
+          id
+        }
+      });
+      const updateThisEntry = await findEntry.update({
+        title: title,
+        date: date,
+        text: text
+      });
+
+      res.status(200).send(`Updated entry ${findEntry.title}`);
+    } else {
+      res.status(200).send('You have no journal entries');
+    }
+  }
+   catch (error) {
+    console.error(error);
+    res.status(404).send('Cannot find user entries');
   }
 })
+
+//user delete entry 
+app.delete('user/entry/delete/:id', async (req, res) => {
+  const [user] = req.oidc.user
+  const id = req.params.id;
+    const userId = req.oidc.user.id;
+    try{
+    if(req.oidc.isAuthenticated()){
+      const userEntries = await Entry.findAll({
+        where: {
+          userId: userId
+        }
+      });
+
+      const findEntry = await userEntries.findAll({
+        where: {
+          id
+        }
+      });
+        const deleteThisEntry = await findEntry.destroy();
+
+      res.status(200).send(`Deleted entry: ${findEntry.title}`);
+    } else {
+      res.status(200).send('You have no journal entries');
+    }
+  }
+   catch (error) {
+    console.error(error);
+    res.status(404).send('Cannot find user entries');
+  }
+})
+
 
 
 
