@@ -53,6 +53,7 @@ router.get("/all", async (request, response) => {
 //Give access to all entries by id SuperAdmin only **works**
 router.get("/:id", async (request, response) => {
     try{
+        const id = request.params.id;
         const userEmail = request.oidc.user.email;
         if(request.oidc.isAuthenticated()){
             const superAdmin = SuperAdmin.findAll({
@@ -61,12 +62,16 @@ router.get("/:id", async (request, response) => {
                 }
             });
             if (superAdmin.length > 0){
-    const id = request.params.id;
-    const getOneEntry = await Entry.findByPk(id);
-    response.status(200).json(getOneEntry);
-        } else {
-            response.status(401).send('Unauthorized');
-        }
+                const getOneEntry = await Entry.findAll({
+                    where: {
+                    id
+                    }
+                });
+                response.status(200).json(getOneEntry);
+                    } else {
+                        response.status(401).send('Unauthorized');
+                    }
+            
     } else {
         response.status(200).send('Please log in');
     }
