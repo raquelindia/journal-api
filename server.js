@@ -244,7 +244,7 @@ app.get('/user/entries/:id', async (req, res) => {
     const username = req.oidc.user.nickname;
     try{
     if(req.oidc.isAuthenticated()){
-      const userEntries = await Entry.findOne({
+      const userEntry = await Entry.findOne({
         where: {
           id: id,
           creator: username
@@ -252,8 +252,8 @@ app.get('/user/entries/:id', async (req, res) => {
       
       });
       //check if entry exists
-      if(findEntry.length > 0){
-      res.status(200).json(findEntry);
+      if(userEntry){
+      res.status(200).json(userEntry);
       } else {
         res.status(404).send('Entry does not exist');
       }
