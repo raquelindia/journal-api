@@ -32,7 +32,7 @@ router.get("/all", async (request, response) => {
                 email: userEmail
             }
         });
-        if (superAdmin){
+        if (superAdmin.length > 0){
     const entries = await Entry.findAll();
     response.status(200).json(entries);
         } else {
@@ -59,7 +59,7 @@ router.get("/:id", async (request, response) => {
                     email: userEmail
                 }
             });
-            if (superAdmin){
+            if (superAdmin.length > 0){
     const id = request.params.id;
     const getOneEntry = await Entry.findByPk(id);
     response.status(200).json(getOneEntry);
@@ -132,11 +132,19 @@ router.put("/:id", async (request, response) => {
 router.delete('/:id', async (request, response) => {
     try{
         if(request.oidc.isAuthenticated()){
-            const superAdmin = SuperAdmin.findAll();
-            if(superAdmin){
+            const superAdmin = SuperAdmin.findAll({
+                where: {
+                    email: userEmail
+                }
+            });
+            if(superAdmin.length > 0){
 const id = request.params.id;
 const foundEntry = await Entry.findByPk(id);
-const deleteEntry = await foundEntry.destroy();
+const deleteEntry = await foundEntry.destroy({
+    where: {
+        id
+    }
+});
 const deleteMessage = `Journal entry ${id} deleted`;
 response.status(200).json(deleteMessage);
     } else {
