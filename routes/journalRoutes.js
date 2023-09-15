@@ -179,12 +179,8 @@ router.delete('/:id', async (request, response) => {
 const id = request.params.id;
 const foundEntry = await Entry.findByPk(id);
 //check if entry exists
-if (foundEntry.length > 0){
-const deleteEntry = await foundEntry.destroy({
-    where: {
-        id
-    }
-});
+if (foundEntry){
+const deleteEntry = await foundEntry.destroy();
 const entryTitle = foundEntry.title;
 const deleteMessage = `Journal entry ${entryTitle} deleted`;
 response.status(200).json(deleteMessage);

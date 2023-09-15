@@ -200,7 +200,7 @@ app.post('/create/entries', async (req, res, next) => {
       <p>${entryContent}</p>
       `);
     } else {
-      res.status(401).send('You must be logged in to create an entry');
+      res.status(403).send('You must be logged in to create an entry');
     }
 
   }catch(error){
@@ -228,7 +228,7 @@ app.get('/user/entries', async (req, res, next) => {
         res.status(200).send('You have no journal entries');
       }
     } else {
-      res.status(200).send('please log in');
+      res.status(403).send('Please log in');
     }
   }
    catch (error) {
@@ -244,16 +244,12 @@ app.get('/user/entries/:id', async (req, res) => {
     const username = req.oidc.user.nickname;
     try{
     if(req.oidc.isAuthenticated()){
-      const userEntries = await Entry.findAll({
+      const userEntries = await Entry.findOne({
         where: {
+          id: id,
           creator: username
         }
-      });
-
-      const findEntry = await userEntries.findAll({
-        where: {
-          id
-        }
+      
       });
       //check if entry exists
       if(findEntry.length > 0){
@@ -279,25 +275,21 @@ app.put('user/entry/update/:id', async (req, res) => {
     const username = req.oidc.user.nickname;
     try{
     if(req.oidc.isAuthenticated()){
-      const userEntries = await Entry.findAll({
+      const userEntry = await Entry.findOne({
         where: {
+          id: id,
           creator: username
         }
       });
 
-      const findEntry = await userEntries.findAll({
-        where: {
-          id
-        }
-      });
-      if (findEntry.length > 0){
-      const updateThisEntry = await findEntry.update({
+      if (userEntry){
+      const updateThisEntry = await userEntry.update({
         title: title,
         date: date,
         text: text
       });
 
-      res.status(200).send(`Updated entry ${findEntry.title}`);
+      res.status(200).send(`Updated entry ${userEntry.title}`);
     } else {
       res.status(404).send('Entry does not exist');
     }
@@ -317,22 +309,18 @@ app.delete('user/entry/delete/:id', async (req, res) => {
     const username = req.oidc.user.nickname;
     try{
     if(req.oidc.isAuthenticated()){
-      const userEntries = await Entry.findAll({
+      const userEntry = await Entry.findOne({
         where: {
+          id: id,
          creator: username
         }
       });
+      //check if entry exists
+        if(userEntry){
 
-      const findEntry = await userEntries.findAll({
-        where: {
-          id
-        }
-      });
-        if(findEntry.length > 0){
+        const deleteThisEntry = await userEntry.destroy();
 
-        const deleteThisEntry = await findEntry.destroy();
-
-      res.status(200).send(`Deleted entry: ${findEntry.title}`);
+      res.status(200).send(`Deleted entry: ${userEntry.title}`);
         } else {
           res.status(404).send('Entry does not exist')
         }
