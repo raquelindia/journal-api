@@ -88,13 +88,13 @@ module.exports = {
         title: 'Masayas first journal entry', 
         date: '2024-09-10',
         text: 'Started new TV show today',
-        creator: 'masaya'
+        creator: 'masayadiaz'
     },
     {
         title: 'Masayas second journal entry', 
         date: '2024-09-03',
         text: 'It rained today',
-        creator: 'masaya'
+        creator: 'masayadiaz'
     },
     {
         title: 'Tys first journal entry', 
@@ -109,7 +109,6 @@ module.exports = {
         creator: 'tellerbe16'
     }
 
-
     ],
 
     users: [
@@ -122,9 +121,9 @@ module.exports = {
         },
         {
     
-            username: "masaya",
+            username: "masayadiaz",
             name: "Masaya Diaz",
-            email: "masaya@gmail.com"
+            email: "masayadiaz@gmail.com"
           
         },
         {
@@ -190,8 +189,12 @@ module.exports = {
         },
         {
         
-            username: "test",
-            email: "test@example.com"
+            username: "masayadiaz",
+            email: "masayadiaz@gmail.com"
+        },
+        {
+            username: "chrismack",
+            email: "chris@gmail.com"
         }
     ]
 
