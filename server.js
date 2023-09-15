@@ -73,16 +73,16 @@ app.get('/logout', (req, res) => {
 
 app.get('/login', (req, res) => {
 
-  const returnTo = req.query.returnTo || '/home';
+  const returnTo = req.query.returnTo || '/user-created';
   res.redirect(returnTo);
 });
 
-app.use(async (req, res, next) => {
+app.get('/user-created', async (req, res) => {
   const username = req.oidc.user.nickname;
   const name = req.oidc.user.name;
   const email =  req.oidc.user.email;
 
-  if(req.oidc.user) {
+  if(req.oidc.isAuthenticated()) {
 
     const [user] = await User.findOrCreate({
       where: {
@@ -90,9 +90,13 @@ app.use(async (req, res, next) => {
         name: name,
         email: email
       }
-    })
+    });
+    res.status(200).send(`Successfully created user: ${username}`);
+
+  } else {
+    res.status(500).send('Could not create user')
   }
-  next();
+ 
 });
 
 const authenticateJWT = async (req, res, next) => {

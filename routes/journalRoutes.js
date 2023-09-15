@@ -22,7 +22,7 @@ router.get("/home", async (request, response) => {
 
 
 
-//Give access to all entries to SuperAdmin only **doesn't work**
+//Give access to all entries to SuperAdmin only **works**
 router.get("/all", async (request, response) => {
     try{
         const userEmail = request.oidc.user.email;
@@ -81,6 +81,8 @@ router.get("/:id", async (request, response) => {
     }
 });
 
+
+//user create entry endpoint
 router.post('/', async (request, response) =>{
     try{
         if(request.oidc.isAuthenticated()){
@@ -104,6 +106,7 @@ response.status(200).json(createEntry);
 
 });
 
+//super admin edit endpoint
 router.put("/:id", async (request, response) => {
     try{
         const userEmail = request.oidc.user.email;
@@ -140,6 +143,8 @@ router.put("/:id", async (request, response) => {
 
 });
 
+
+//super admin delete endpoint 
 router.delete('/:id', async (request, response) => {
     try{
         if(request.oidc.isAuthenticated()){
