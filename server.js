@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const {sequelize} = require('./db');
 const bodyParser = require('body-parser');
-const seedData = require('./seed')
+const seedData = require('./seed');
 const journalRouter = require('./routes/journalRoutes');
 const { auth } = require('express-openid-connect');
 const { User } = require('./models/index');
@@ -180,12 +180,22 @@ app.post('/create/entries', async (req, res, next) => {
     const {title, date, text} = req.body;
     const [username] = req.oidc.user.nickname;
 
+  const findBy = await Entry.findAll({
+    where: {
+      creator: username
+    }
+  });
+  //user can find their entry by id, even if they created an entry after someone else
+ const numberOfEntriesByUser = findBy.length;
+ const newCount = numberOfEntriesByUser + 1;
+
     if (req.oidc.isAuthenticated()){
       const createEntry = await Entry.create({
         title: title,
         date: date,
         text: text,
-        creator: username
+        creator: username,
+        entryNumber: newCount
       });
       
       const findUserEntries = await Entry.findAll({
@@ -259,7 +269,7 @@ app.get('/entries/:id', async (req, res) => {
     if(req.oidc.isAuthenticated()){
       const userEntry = await Entry.findOne({
         where: {
-          id: id,
+          entryNumber: id,
           creator: username
         }
       
@@ -283,6 +293,7 @@ app.get('/entries/:id', async (req, res) => {
 
 //user update entry
 app.put('/entry/update/:id', async (req, res) => {
+
   const id = req.params.id;
   const {title, date, text} = req.body;
     const username = req.oidc.user.nickname;
@@ -290,7 +301,7 @@ app.put('/entry/update/:id', async (req, res) => {
     if(req.oidc.isAuthenticated()){
       const userEntry = await Entry.findOne({
         where: {
-          id: id,
+          entryNumber: id,
           creator: username
         }
       });
@@ -324,7 +335,7 @@ app.delete('/entry/delete/:id', async (req, res) => {
     if(req.oidc.isAuthenticated()){
       const userEntry = await Entry.findOne({
         where: {
-          id: id,
+          entryNumber: id,
          creator: username
         }
       });
