@@ -56,7 +56,7 @@ router.get("/:id", async (request, response) => {
         const id = request.params.id;
         const userEmail = request.oidc.user.email;
         if(request.oidc.isAuthenticated()){
-            const superAdmin = SuperAdmin.findAll({
+            const superAdmin = await SuperAdmin.findAll({
                 where: {
                     email: userEmail
                 }
