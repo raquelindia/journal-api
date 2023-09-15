@@ -106,9 +106,14 @@ response.status(200).json(createEntry);
 
 router.put("/:id", async (request, response) => {
     try{
+        const userEmail = request.oidc.user.email;
         if(request.oidc.isAuthenticated()){
-            const superAdmin = SuperAdmin.findAll();
-            if(request.oidc.user.email == superAdmin[0].email){
+            const superAdmin = await SuperAdmin.findAll({
+                where: {
+                    email: userEmail
+                }
+            });
+            if(superAdmin.length > 0){
     const id = request.params.id;
     const editTitle = request.body.title;
     const editDate = request.body.date;
