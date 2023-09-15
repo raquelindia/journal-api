@@ -110,9 +110,49 @@ router.get("/all/:id", async (request, response) => {
     }
 });
 
+//super admin edit User 
+router.put('/users/edit/:id', async (request, response) => {
+    try{
+        const userEmail = request.oidc.user.email;
+        if(request.oidc.isAuthenticated()){
+            const superAdmin = await SuperAdmin.findAll({
+                where: {
+                    email: userEmail
+                }
+            });
+            if(superAdmin.length > 0){
+    const id = request.params.id;
+    const editUsername = request.body.username;
+    const editEmail = request.body.email;
+    const editName = request.body.name;
+    const foundUser = await User.findByPk(id);
+    //check if user exists
+    if (foundUser){
+        const editUser = await foundUser.update({
+            username: editUsername,
+            name: editName,
+            email: editEmail
+        });
+
+        response.status(200).send('Successfully edited user information');
+
+    }
+ } else {
+        response.status(404).send('User not found');
+    }
+} else {
+    response.status(403).send('Please log in');
+}
+}   catch(error){
+        response(500).send('Internal Server Error');
+    }
+
+})
+
 //super admin edit endpoint
 router.put("/all/:id", async (request, response) => {
     try{
+        
         const userEmail = request.oidc.user.email;
         if(request.oidc.isAuthenticated()){
             const superAdmin = await SuperAdmin.findAll({
@@ -135,7 +175,7 @@ router.put("/all/:id", async (request, response) => {
         text: editText
     });
 
-    response.status(200).json(editEntry);
+    response.status(200).send('Successfully edited entry');
 } else {
     response.status(404).send('Entry not found');
 }
@@ -149,6 +189,41 @@ router.put("/all/:id", async (request, response) => {
     console.error(error);
     response.status(500).json('Internal Server Error');
 }
+
+});
+
+//super admin delete user 
+router.delete('/delete/user/:id', async (request, response) => {
+    try{
+        if(request.oidc.isAuthenticated()){
+            const userEmail = request.oidc.user.email
+            const superAdmin = SuperAdmin.findAll({
+                where: {
+                    email: userEmail
+                }
+            });
+            if(superAdmin.length > 0){
+const id = request.params.id;
+const foundUser = await User.findByPk(id);
+//check if User exists
+if (foundUser){
+const deleteUser = await foundUser.destroy();
+const userName = foundUser.username;
+const deleteMessage = `User: ${userName} deleted`;
+response.status(200).json(deleteMessage);
+} else {
+    response.status(404).send('User not found');
+}
+    } else {
+        response.status(403).send('Unauthorized');
+    }
+} else {
+    response.status(401).send('Please log in');
+}
+}catch(error){
+        console.error(error);
+        response.status(500).json('Internal Server Error');
+    }
 
 });
 
