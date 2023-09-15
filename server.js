@@ -259,7 +259,7 @@ app.get('/user/entries/:id', async (req, res) => {
       if(findEntry.length > 0){
       res.status(200).json(findEntry);
       } else {
-        res.status(200).send('You have no journal entries');
+        res.status(404).send('Entry does not exist');
       }
     } else {
       res.status(403).send('Please log in');
