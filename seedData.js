@@ -22,13 +22,13 @@ module.exports = {
         title: 'Journal Entry #4',
         date: '2023-09-05',
         text: 'Hung out with friends',
-        creator: 'raquelicruz94'
+        creator: 'jenny'
     },
     {
         title: 'Journal Entry #5', 
         date: '2024-09-06',
         text: 'Started new TV show today',
-        creator: 'raquelicruz94'
+        creator: 'dean'
     }
 
     ],
