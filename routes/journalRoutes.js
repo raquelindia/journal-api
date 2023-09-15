@@ -31,7 +31,7 @@ router.get('/users', async (request, response) => {
                 }
             });
             if(superAdmin.length > 0 ){
-                const users = User.findAll();
+                const users = await User.findAll();
                 response.status(200).json(users);
             } else {
                 response.status(404).send('Unauthorized');
@@ -42,7 +42,7 @@ router.get('/users', async (request, response) => {
 
     } catch(error){
         console.error(error);
-        response.status(404).send('Cannot find users');
+        response.status(500).send('Internal Server Error');
     }
 })
 
