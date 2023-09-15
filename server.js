@@ -147,45 +147,36 @@ app.post('/create/entries', async (req, res, next) => {
   try{
     const {title, date, text} = req.body;
     //const creatorId = req.user.id;
-    const [user] = req.oidc.user;
-    const [email] = req.oidc.user.email;
+    const [username] = req.oidc.user.nickname;
 
     if (req.oidc.isAuthenticated()){
-      const foundUser = User.findOne({
-        where: {
-          email: email
-         }
-      });
       const createEntry = await Entry.create({
         title: title,
         date: date,
-        text: text
+        text: text,
+        creator: username
       });
-      const userAssociation = await User.findAll({ include: [{model: Entry, as: 'entries'}]});
-      const entryAssociation = await Entry.findAll({include: [{model: User, as: 'user'}]});
-      const loadedUser = await User.findOne({
+      
+      const findUserEntries = await Entry.findAll({
         where: {
-            id: user.id
-        },
-        include: Entry
-       });
-      // number of entries
-       const numberOfEntries = loadedUser.entries.length;
-       //index of newest entry
-       const index = numberOfEntries - 1;
-       //newest entry
-       const newestEntry = loadedUser.entries[index];
+          creator: username
+        }
+      });
 
-       const entryTitle = createEntry.title;
-       const entryDate = createEntry.date;
-       const entryContent = createEntry.text;
-      const userIndex = user.id - 1;
-       const thisUser = userAssociation[userIndex];
-       
+      const findThisEntry = await findUserEntries.findAll({
+        where: {
+          title: title
+        }
+      })
 
-       await thisUser.addEntry(newestEntry);
 
-      res.status(200).send(`<h1>Successfully created entry number ${numberOfEntries}</h1>
+      const numberOfEntries = findUserEntries.length;
+      const entryTitle = findThisEntry.title;
+      const entryDate = findThisEntry.date;
+      const entryContent = findThisEntry.text;
+
+      
+      res.status(200).send(`<h1>Successfully created entry: ${numberOfEntries}</h1>
       <h2>${entryTitle}</h2>
       <h3>${entryDate}</h3>
       <p>${entryContent}</p>
@@ -193,12 +184,11 @@ app.post('/create/entries', async (req, res, next) => {
     } else {
       res.status(401).send('You must be logged in to create an entry');
     }
-    const entries = await Entry.findAll();
-    res.send(entries);
 
   }catch(error){
     console.error(error);
-    next(error);
+    res.status(500).send('Internal Server Error');
+    
 
   }
 });
@@ -206,37 +196,39 @@ app.post('/create/entries', async (req, res, next) => {
 //user can read all their entries 
 app.get('/user/entries', async (req, res, next) => {
   try {
-    const [user] = req.oidc.user
-    const userId = req.oidc.user.id;
+    const username = req.oidc.user.nickname;
     if(req.oidc.isAuthenticated()){
       const userEntries = await Entry.findAll({
         where: {
-          userId: userId
+          creator: username
         }
       });
+      if(userEntries.length > 0){ 
+
       res.status(200).json(userEntries);
+      } else {
+        res.status(200).send('You have no journal entries');
+      }
     } else {
-      res.status(200).send('You have no journal entries');
+      res.status(200).send('please log in');
     }
   }
    catch (error) {
     console.error(error);
-    res.status(404).send('Cannot find user entries');
+    res.status(500).send('Internal Server Error');
   }
 });
 
 
 //user can find one entry out of all their entries
 app.get('/user/entries/:id', async (req, res) => {
-
-  const [user] = req.oidc.user
   const id = req.params.id;
-    const userId = req.oidc.user.id;
+    const username = req.oidc.user.nickname;
     try{
     if(req.oidc.isAuthenticated()){
       const userEntries = await Entry.findAll({
         where: {
-          userId: userId
+          creator: username
         }
       });
 
@@ -245,29 +237,32 @@ app.get('/user/entries/:id', async (req, res) => {
           id
         }
       });
+      if(findEntry.length > 0){
       res.status(200).json(findEntry);
+      } else {
+        res.status(200).send('You have no journal entries');
+      }
     } else {
-      res.status(200).send('You have no journal entries');
+      res.status(403).send('Please log in');
     }
   }
    catch (error) {
     console.error(error);
-    res.status(404).send('Cannot find user entries');
+    res.status(500).send('Internal Server Error');
   }
 });
 
 
 //user update entry
 app.put('user/entry/update/:id', async (req, res) => {
-  const [user] = req.oidc.user
   const id = req.params.id;
   const {title, date, text} = req.body;
-    const userId = req.oidc.user.id;
+    const username = req.oidc.user.nickname;
     try{
     if(req.oidc.isAuthenticated()){
       const userEntries = await Entry.findAll({
         where: {
-          userId: userId
+          creator: username
         }
       });
 
@@ -276,6 +271,7 @@ app.put('user/entry/update/:id', async (req, res) => {
           id
         }
       });
+      if (findEntry.length > 0){
       const updateThisEntry = await findEntry.update({
         title: title,
         date: date,
@@ -284,25 +280,27 @@ app.put('user/entry/update/:id', async (req, res) => {
 
       res.status(200).send(`Updated entry ${findEntry.title}`);
     } else {
-      res.status(200).send('You have no journal entries');
+      res.status(404).send('Entry does not exist');
+    }
+    } else {
+      res.status(403).send('Please log in');
     }
   }
    catch (error) {
     console.error(error);
-    res.status(404).send('Cannot find user entries');
+    res.status(500).send('Internal Server Error');
   }
 })
 
 //user delete entry 
 app.delete('user/entry/delete/:id', async (req, res) => {
-  const [user] = req.oidc.user
   const id = req.params.id;
-    const userId = req.oidc.user.id;
+    const username = req.oidc.user.nickname;
     try{
     if(req.oidc.isAuthenticated()){
       const userEntries = await Entry.findAll({
         where: {
-          userId: userId
+         creator: username
         }
       });
 
@@ -311,16 +309,21 @@ app.delete('user/entry/delete/:id', async (req, res) => {
           id
         }
       });
+        if(findEntry.length > 0){
+
         const deleteThisEntry = await findEntry.destroy();
 
       res.status(200).send(`Deleted entry: ${findEntry.title}`);
+        } else {
+          res.status(404).send('Entry does not exist')
+        }
     } else {
       res.status(200).send('You have no journal entries');
     }
   }
    catch (error) {
     console.error(error);
-    res.status(404).send('Cannot find user entries');
+    res.status(500).send('Internal Server Error');
   }
 })
 
@@ -334,7 +337,7 @@ app.use((error, req, res, next) => {
   res.send({error: error.message, name: error.name, message: error.message});
 });
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 9000;
 
 app.listen(port, () => {
   sequelize.sync()

@@ -34,7 +34,7 @@ router.get('/users', async (request, response) => {
                 const users = await User.findAll();
                 response.status(200).json(users);
             } else {
-                response.status(404).send('Unauthorized');
+                response.status(403).send('Unauthorized');
             }
         } else {
             response.status(200).send('Please log in');
@@ -62,7 +62,7 @@ router.get("/all", async (request, response) => {
     const entries = await Entry.findAll();
     response.status(200).json(entries);
         } else {
-            response.status(401).send('Unauthorized');
+            response.status(403).send('Unauthorized');
         }
     } else {
         response.status(200).send('Please log in');
@@ -94,7 +94,7 @@ router.get("/:id", async (request, response) => {
                 });
                 response.status(200).json(getOneEntry);
                     } else {
-                        response.status(401).send('Unauthorized');
+                        response.status(403).send('Unauthorized');
                     }
             
     } else {
@@ -131,7 +131,7 @@ router.put("/:id", async (request, response) => {
 
     response.status(200).json(editEntry);
 } else {
-    response.status(401).send('Unauthorized');
+    response.status(403).send('Unauthorized');
 }
 } else {
     response.status(401).send('Please log in');
@@ -165,7 +165,7 @@ const deleteEntry = await foundEntry.destroy({
 const deleteMessage = `Journal entry ${id} deleted`;
 response.status(200).json(deleteMessage);
     } else {
-        response.status(401).send('Access not authorized');
+        response.status(403).send('Access not authorized');
     }
 } else {
     response.status(401).send('Please log in');
