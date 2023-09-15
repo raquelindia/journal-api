@@ -26,6 +26,7 @@ router.get("/home", async (request, response) => {
 router.get("/all", async (request, response) => {
     try{
         const userEmail = request.oidc.user.email;
+        console.log(userEmail);
         if(request.oidc.isAuthenticated()){
         const superAdmin = await SuperAdmin.findAll({
             where: {
@@ -132,6 +133,7 @@ router.put("/:id", async (request, response) => {
 router.delete('/:id', async (request, response) => {
     try{
         if(request.oidc.isAuthenticated()){
+            const userEmail = request.oidc.user.email
             const superAdmin = SuperAdmin.findAll({
                 where: {
                     email: userEmail
@@ -158,6 +160,6 @@ response.status(200).json(deleteMessage);
         response.status(404).json('Could not delete entry');
     }
 
-});
+}); 
 
 module.exports = router;

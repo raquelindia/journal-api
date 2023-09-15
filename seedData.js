@@ -53,12 +53,14 @@ module.exports = {
     superadmins: [
         {
            
-            username: "raquelicruz94"
+            username: "raquelicruz94",
+            email: "raquelicruz94@gmail.com"
 
         },
         {
         
-            username: "test"
+            username: "test",
+            email: "test@example.com"
         }
     ]
 
