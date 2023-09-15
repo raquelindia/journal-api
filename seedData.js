@@ -107,6 +107,12 @@ module.exports = {
         date: '2024-09-27',
         text: 'It rained today',
         creator: 'tellerbe16'
+    },
+    {
+        title: 'Finished my project today', 
+        date: '2023-09-15',
+        text: 'It was a good day',
+        creator: 'raquelicruz94'
     }
 
     ],
