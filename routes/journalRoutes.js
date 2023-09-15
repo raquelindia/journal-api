@@ -25,7 +25,7 @@ router.get('/users', async (request, response) => {
         const userEmail = request.oidc.user.email;
         if(request.oidc.isAuthenticated()){
             const superAdmin = await SuperAdmin.findAll({
-                where:{
+                where: {
                     email: userEmail
                 }
             });
@@ -35,6 +35,8 @@ router.get('/users', async (request, response) => {
             } else {
                 response.status(404).send('Unauthorized');
             }
+        } else {
+            response.status(200).send('Please log in');
         }
 
     } catch(error){
